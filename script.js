@@ -1,8 +1,8 @@
 // Enhanced Multi-Layer Minecraft Game for Children
 class MinecraftGame {
     constructor() {
-        // Define the 5 block states in cycle order (added Diamond!)
-        this.states = ['empty', 'grass', 'stone', 'wood', 'diamond'];
+        // Define the 6 block states in cycle order (added Diamond & Steve!)
+        this.states = ['empty', 'grass', 'stone', 'wood', 'diamond', 'steve'];
 
         // Multi-layer system: Each layer is a 4x4 grid (16 squares)
         this.layers = [];
@@ -149,7 +149,7 @@ class MinecraftGame {
         const currentGrid = this.layers[this.currentLayer];
 
         // Remove all state classes
-        square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond');
+        square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond', 'steve');
 
         // Add the current state class
         const currentState = this.states[currentGrid[index]];
@@ -321,6 +321,7 @@ class MinecraftGame {
             welcome: ["Ready to build! 🔨", "Let's create something amazing! ✨", "I'm here to help! 😊"],
             building: ["Great choice! 👍", "Nice block placement! 🎯", "You're a natural builder! 🏗️", "Keep going! 💪"],
             diamond: ["Wow, diamonds! ✨", "Shiny! I love diamonds! 💎", "That's precious! 💎✨"],
+            steve_placed: ["I'm on the board! 🎯", "Ready to help from here! 👷", "Perfect spot! 🌟"],
             house: ["Amazing house! 🏠", "What a beautiful home! 🏡", "You're an architect! 👷", "Fantastic building! 🌟"],
             layer: ["New layer, new possibilities! 🚀", "Building up! ⬆️", "Next floor! 🏗️", "Going higher! 🌟"],
             clear: ["Clean slate! 🧽", "Fresh start! ✨", "Ready for new ideas! 💡"]
@@ -334,7 +335,10 @@ class MinecraftGame {
             this.steveInteraction();
         });
 
-        // Show welcome message
+        // Setup drag and drop for Steve
+        this.setupSteveDragAndDrop();
+
+        // Show welcome message with drag instruction
         setTimeout(() => {
             this.showSteveMessage('welcome');
         }, 1000);
@@ -395,6 +399,77 @@ class MinecraftGame {
         }, 600);
     }
 
+    // Setup drag and drop functionality for Steve
+    setupSteveDragAndDrop() {
+        // Make Steve draggable
+        this.steveCharacter.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', 'steve');
+            this.steveCharacter.classList.add('dragging');
+
+            // Show helpful message
+            this.steveSpeech.innerHTML = '<p>Drop me on any square! 🎯</p>';
+            this.steveSpeech.classList.add('show');
+        });
+
+        this.steveCharacter.addEventListener('dragend', (e) => {
+            this.steveCharacter.classList.remove('dragging');
+            this.steveSpeech.classList.remove('show');
+        });
+
+        // Setup drop zones on game board squares
+        this.gameBoard.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Allow drop
+            if (e.target.classList.contains('grid-square')) {
+                e.target.classList.add('drag-over');
+            }
+        });
+
+        this.gameBoard.addEventListener('dragleave', (e) => {
+            if (e.target.classList.contains('grid-square')) {
+                e.target.classList.remove('drag-over');
+            }
+        });
+
+        this.gameBoard.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (e.target.classList.contains('grid-square')) {
+                e.target.classList.remove('drag-over');
+
+                const droppedData = e.dataTransfer.getData('text/plain');
+                if (droppedData === 'steve') {
+                    const squareIndex = parseInt(e.target.dataset.index);
+                    this.placeSteve(squareIndex);
+                }
+            }
+        });
+    }
+
+    // Place Steve on the game board
+    placeSteve(squareIndex) {
+        const currentGrid = this.layers[this.currentLayer];
+
+        // Set square to Steve state (index 5 in our states array)
+        currentGrid[squareIndex] = 5; // steve state
+
+        // Update visual appearance
+        const square = document.querySelector(`[data-index="${squareIndex}"]`);
+        this.updateSquareAppearance(square, squareIndex);
+
+        // Add building animation
+        square.classList.add('building');
+        setTimeout(() => {
+            square.classList.remove('building');
+        }, 600);
+
+        // Steve celebrates being placed
+        setTimeout(() => {
+            this.showSteveMessage('steve_placed');
+        }, 300);
+
+        // Update 3D preview
+        this.update3DPreview();
+    }
+
     // === 3D PREVIEW SYSTEM ===
 
     // Create the 3D preview structure
@@ -431,7 +506,7 @@ class MinecraftGame {
                 const blockType = this.states[state];
 
                 // Remove all block state classes
-                square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond');
+                square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond', 'steve');
 
                 // Add current block state class
                 square.classList.add(blockType);

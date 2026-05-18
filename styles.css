@@ -132,6 +132,32 @@ body {
     animation: steveExcited 0.6s ease-in-out;
 }
 
+/* Steve drag instruction */
+.steve-instruction {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    opacity: 0.8;
+}
+
+/* Drag and drop visual feedback */
+.steve-character.dragging {
+    opacity: 0.7;
+    transform: scale(0.9);
+    cursor: grabbing;
+}
+
+.steve-character:not(.dragging) {
+    cursor: grab;
+}
+
+.grid-square.drag-over {
+    border-color: #4CAF50 !important;
+    background-color: rgba(76, 175, 80, 0.2) !important;
+    transform: scale(1.05);
+}
+
 .building-panel {
     flex: 1;
     min-width: 450px;
@@ -325,6 +351,14 @@ body {
     box-shadow: 0 0 15px rgba(0, 206, 209, 0.5);
 }
 
+.grid-square.steve {
+    background-image: url('assets/Steve.png');
+    background-color: #8B4513;
+    border-color: #4CAF50;
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+    background-size: contain;
+}
+
 /* Enhanced hover effects */
 .grid-square:hover {
     transform: scale(1.08) rotate(1deg);
@@ -457,6 +491,15 @@ body {
     box-shadow: 0 0 10px rgba(0, 206, 209, 0.5);
 }
 
+.steve-preview {
+    background-image: url('assets/Steve.png');
+    background-color: #8B4513;
+    background-size: contain;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
 .arrow {
     font-size: 18px;
     color: #6c757d;
@@ -506,6 +549,17 @@ body {
 
 .grid-square.diamond {
     animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Steve animation on game board */
+@keyframes steveOnBoard {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.02) rotate(-1deg); }
+    75% { transform: scale(1.02) rotate(1deg); }
+}
+
+.grid-square.steve {
+    animation: steveOnBoard 3s ease-in-out infinite;
 }
 
 /* 3D Preview Panel Styles */
@@ -595,6 +649,12 @@ body {
     background-image: url('assets/Diamond.webp');
     background-color: #B0E0E6;
     box-shadow: 0 0 8px rgba(0, 206, 209, 0.6);
+}
+.preview-square.steve {
+    background-image: url('assets/Steve.png');
+    background-color: #8B4513;
+    background-size: contain;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
 }
 
 
