@@ -22,8 +22,6 @@ class MinecraftGame {
 
         // 3D Preview elements
         this.preview3D = document.getElementById('preview3D');
-        this.rotateButton = document.getElementById('rotateButton');
-        this.toggleLayersButton = document.getElementById('toggleLayersButton');
 
         this.initializeGame();
     }
@@ -96,14 +94,6 @@ class MinecraftGame {
             this.goToLayer(this.currentLayer - 1);
         });
 
-        // 3D Preview controls
-        this.rotateButton.addEventListener('click', () => {
-            this.rotate3DPreview();
-        });
-
-        this.toggleLayersButton.addEventListener('click', () => {
-            this.toggle3DLayers();
-        });
 
         // Keyboard shortcuts for quick layer switching (for parents/advanced users)
         document.addEventListener('keydown', (event) => {
@@ -364,38 +354,6 @@ class MinecraftGame {
         }
     }
 
-    // Rotate the 3D preview for a different viewing angle
-    rotate3DPreview() {
-        this.preview3D.classList.add('rotating');
-
-        // Remove rotation class after animation completes
-        setTimeout(() => {
-            this.preview3D.classList.remove('rotating');
-        }, 3000);
-
-        // Update button text during rotation
-        const originalText = this.rotateButton.textContent;
-        this.rotateButton.textContent = '🌀 Rotating...';
-        this.rotateButton.disabled = true;
-
-        setTimeout(() => {
-            this.rotateButton.textContent = originalText;
-            this.rotateButton.disabled = false;
-        }, 3000);
-    }
-
-    // Toggle layer visibility in 3D preview
-    toggle3DLayers() {
-        const isHidden = this.preview3D.classList.contains('layers-hidden');
-
-        if (isHidden) {
-            this.preview3D.classList.remove('layers-hidden');
-            this.toggleLayersButton.textContent = '👁️ Hide Upper Layers';
-        } else {
-            this.preview3D.classList.add('layers-hidden');
-            this.toggleLayersButton.textContent = '👁️ Show All Layers';
-        }
-    }
 
     // Clear current layer and update preview
     clearCurrentLayer() {
