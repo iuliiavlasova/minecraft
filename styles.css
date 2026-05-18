@@ -22,7 +22,34 @@ body {
     padding: 30px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(15px);
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* Main game area with side-by-side layout */
+.game-area {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.building-panel {
+    flex: 1;
+    min-width: 450px;
     max-width: 600px;
+}
+
+.preview-panel {
+    flex: 1;
+    min-width: 350px;
+    max-width: 500px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #dee2e6;
 }
 
 /* Logo section */
@@ -384,11 +411,210 @@ body {
     animation: sparkle 2s ease-in-out infinite;
 }
 
+/* 3D Preview Panel Styles */
+.preview-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.preview-header h3 {
+    color: #495057;
+    font-size: 22px;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-subtitle {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+}
+
+.preview-container {
+    margin-bottom: 20px;
+}
+
+/* 3D Preview Grid */
+.preview-3d {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 15px auto;
+    perspective: 800px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 15px;
+    border: 3px solid #2196F3;
+    position: relative;
+    overflow: hidden;
+}
+
+.preview-layer {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    top: 50%;
+    transform-origin: center center;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2px;
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+}
+
+.preview-square {
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* 3D layer positioning with isometric view */
+.preview-layer:nth-child(1) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(0px); }
+.preview-layer:nth-child(2) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(15px); }
+.preview-layer:nth-child(3) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(30px); }
+.preview-layer:nth-child(4) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(45px); }
+.preview-layer:nth-child(5) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(60px); }
+.preview-layer:nth-child(6) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(75px); }
+.preview-layer:nth-child(7) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(90px); }
+.preview-layer:nth-child(8) { transform: translate(-50%, -50%) rotateX(60deg) translateZ(105px); }
+
+/* Preview block states */
+.preview-square.empty { background-color: transparent; border-color: transparent; }
+.preview-square.grass {
+    background-image: url('assets/grass block.png');
+    background-color: #90EE90;
+}
+.preview-square.stone {
+    background-image: url('assets/Stone_JE5_BE3.png');
+    background-color: #696969;
+}
+.preview-square.wood {
+    background-image: url('assets/wood.jpg');
+    background-color: #DEB887;
+}
+.preview-square.diamond {
+    background-image: url('assets/Diamond.webp');
+    background-color: #B0E0E6;
+    box-shadow: 0 0 8px rgba(0, 206, 209, 0.6);
+}
+
+/* Preview controls */
+.preview-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.preview-button {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.preview-button:hover {
+    background: linear-gradient(45deg, #1976D2, #1565C0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.preview-button:active {
+    transform: translateY(0);
+}
+
+/* Layer Legend */
+.layer-legend {
+    text-align: left;
+}
+
+.layer-legend h4 {
+    color: #495057;
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid #dee2e6;
+}
+
+.layer-1-color { background: linear-gradient(45deg, #696969, #90EE90); }
+.layer-3-4-color { background: linear-gradient(45deg, #DEB887, #B0E0E6); }
+.layer-5-8-color { background: linear-gradient(45deg, #90EE90, #B0E0E6); }
+
+/* Rotation animation for preview */
+@keyframes rotate3D {
+    0% { transform: translate(-50%, -50%) rotateX(60deg) rotateY(0deg); }
+    100% { transform: translate(-50%, -50%) rotateX(60deg) rotateY(360deg); }
+}
+
+.preview-3d.rotating .preview-layer {
+    animation: rotate3D 3s linear;
+}
+
+/* Layer visibility toggle */
+.preview-3d.layers-hidden .preview-layer:nth-child(n+3) {
+    opacity: 0.3;
+}
+
 /* Responsive design for smaller screens */
+@media (max-width: 1024px) {
+    .game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .building-panel, .preview-panel {
+        min-width: unset;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .preview-3d {
+        width: 250px;
+        height: 250px;
+    }
+
+    .preview-layer {
+        width: 160px;
+        height: 160px;
+    }
+}
+
 @media (max-width: 600px) {
     .container {
         padding: 20px;
         margin: 10px;
+    }
+
+    .game-area {
+        gap: 20px;
     }
 
     .game-board-container {
@@ -438,5 +664,24 @@ body {
 
     .arrow {
         font-size: 14px;
+    }
+
+    .preview-3d {
+        width: 200px;
+        height: 200px;
+    }
+
+    .preview-layer {
+        width: 120px;
+        height: 120px;
+    }
+
+    .preview-header h3 {
+        font-size: 18px;
+    }
+
+    .preview-button {
+        padding: 6px 12px;
+        font-size: 11px;
     }
 }

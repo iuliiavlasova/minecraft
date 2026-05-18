@@ -20,6 +20,11 @@ class MinecraftGame {
         this.layerDownButton = document.getElementById('layerDownButton');
         this.layerNumber = document.getElementById('layerNumber');
 
+        // 3D Preview elements
+        this.preview3D = document.getElementById('preview3D');
+        this.rotateButton = document.getElementById('rotateButton');
+        this.toggleLayersButton = document.getElementById('toggleLayersButton');
+
         this.initializeGame();
     }
 
@@ -36,9 +41,11 @@ class MinecraftGame {
     // Set up the game board and event listeners
     initializeGame() {
         this.createGameBoard();
+        this.create3DPreview();
         this.setupEventListeners();
         this.updateLayerDisplay();
         this.updateLayerButtons();
+        this.update3DPreview();
     }
 
     // Generate the 4x4 grid of clickable squares
@@ -89,6 +96,15 @@ class MinecraftGame {
             this.goToLayer(this.currentLayer - 1);
         });
 
+        // 3D Preview controls
+        this.rotateButton.addEventListener('click', () => {
+            this.rotate3DPreview();
+        });
+
+        this.toggleLayersButton.addEventListener('click', () => {
+            this.toggle3DLayers();
+        });
+
         // Keyboard shortcuts for quick layer switching (for parents/advanced users)
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowUp' && event.ctrlKey) {
@@ -123,6 +139,9 @@ class MinecraftGame {
         if (this.states[currentGrid[index]] === 'diamond') {
             this.addSparkleEffect(square);
         }
+
+        // Update 3D preview
+        this.update3DPreview();
     }
 
     // Update the visual appearance of a square based on its state
@@ -162,6 +181,9 @@ class MinecraftGame {
         setTimeout(() => {
             this.gameBoard.classList.remove('layer-changing');
         }, 400);
+
+        // Update 3D preview
+        this.update3DPreview();
     }
 
     // Update the layer display
@@ -189,25 +211,6 @@ class MinecraftGame {
         }
     }
 
-    // Clear the current layer
-    clearCurrentLayer() {
-        const currentGrid = this.layers[this.currentLayer];
-
-        // Clear all squares with animation
-        for (let i = 0; i < 16; i++) {
-            setTimeout(() => {
-                currentGrid[i] = 0; // Set to empty
-                const square = document.querySelector(`[data-index="${i}"]`);
-                this.updateSquareAppearance(square, i);
-
-                // Add clearing animation
-                square.classList.add('building');
-                setTimeout(() => {
-                    square.classList.remove('building');
-                }, 600);
-            }, i * 50); // Stagger the clearing animation
-        }
-    }
 
     // Build a multi-layer house automatically
     buildMultiLayerHouse() {
@@ -271,6 +274,11 @@ class MinecraftGame {
                 }
             }, index * 80); // Stagger the building animation
         });
+
+        // Update 3D preview after pattern is applied
+        setTimeout(() => {
+            this.update3DPreview();
+        }, pattern.length * 80 + 600);
     }
 
     // Add sparkle effect for special blocks
@@ -294,6 +302,124 @@ class MinecraftGame {
             const blockCount = layer.filter(state => state !== 0).length;
             return `Layer ${index + 1}: ${blockCount} blocks`;
         }).join('\n');
+    }
+
+    // === 3D PREVIEW SYSTEM ===
+
+    // Create the 3D preview structure
+    create3DPreview() {
+        this.preview3D.innerHTML = '';
+
+        // Create 8 layer divs for the 3D preview
+        for (let layerIndex = 0; layerIndex < this.maxLayers; layerIndex++) {
+            const layerDiv = document.createElement('div');
+            layerDiv.classList.add('preview-layer');
+            layerDiv.dataset.layer = layerIndex;
+
+            // Create 16 squares for each layer (4x4 grid)
+            for (let squareIndex = 0; squareIndex < 16; squareIndex++) {
+                const square = document.createElement('div');
+                square.classList.add('preview-square');
+                square.dataset.index = squareIndex;
+                layerDiv.appendChild(square);
+            }
+
+            this.preview3D.appendChild(layerDiv);
+        }
+    }
+
+    // Update the 3D preview to reflect current state
+    update3DPreview() {
+        for (let layerIndex = 0; layerIndex < this.maxLayers; layerIndex++) {
+            const layerDiv = this.preview3D.querySelector(`[data-layer="${layerIndex}"]`);
+            const layer = this.layers[layerIndex];
+
+            for (let squareIndex = 0; squareIndex < 16; squareIndex++) {
+                const square = layerDiv.querySelector(`[data-index="${squareIndex}"]`);
+                const state = layer[squareIndex];
+                const blockType = this.states[state];
+
+                // Remove all block state classes
+                square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond');
+
+                // Add current block state class
+                square.classList.add(blockType);
+
+                // Add subtle transparency for better 3D effect
+                if (blockType === 'empty') {
+                    square.style.opacity = '0.1';
+                } else {
+                    square.style.opacity = '0.9';
+                }
+            }
+
+            // Highlight current layer being edited
+            if (layerIndex === this.currentLayer) {
+                layerDiv.style.border = '2px solid #FFD700';
+                layerDiv.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.5)';
+            } else {
+                layerDiv.style.border = '1px solid rgba(0, 0, 0, 0.1)';
+                layerDiv.style.boxShadow = 'none';
+            }
+        }
+    }
+
+    // Rotate the 3D preview for a different viewing angle
+    rotate3DPreview() {
+        this.preview3D.classList.add('rotating');
+
+        // Remove rotation class after animation completes
+        setTimeout(() => {
+            this.preview3D.classList.remove('rotating');
+        }, 3000);
+
+        // Update button text during rotation
+        const originalText = this.rotateButton.textContent;
+        this.rotateButton.textContent = '🌀 Rotating...';
+        this.rotateButton.disabled = true;
+
+        setTimeout(() => {
+            this.rotateButton.textContent = originalText;
+            this.rotateButton.disabled = false;
+        }, 3000);
+    }
+
+    // Toggle layer visibility in 3D preview
+    toggle3DLayers() {
+        const isHidden = this.preview3D.classList.contains('layers-hidden');
+
+        if (isHidden) {
+            this.preview3D.classList.remove('layers-hidden');
+            this.toggleLayersButton.textContent = '👁️ Hide Upper Layers';
+        } else {
+            this.preview3D.classList.add('layers-hidden');
+            this.toggleLayersButton.textContent = '👁️ Show All Layers';
+        }
+    }
+
+    // Clear current layer and update preview
+    clearCurrentLayer() {
+        const currentGrid = this.layers[this.currentLayer];
+
+        // Clear all squares with animation
+        for (let i = 0; i < 16; i++) {
+            setTimeout(() => {
+                currentGrid[i] = 0; // Set to empty
+                const square = document.querySelector(`[data-index="${i}"]`);
+                this.updateSquareAppearance(square, i);
+
+                // Add clearing animation
+                square.classList.add('building');
+                setTimeout(() => {
+                    square.classList.remove('building');
+                }, 600);
+            }, i * 50); // Stagger the clearing animation
+        }
+
+        // Update 3D preview after clearing animation
+        setTimeout(() => {
+            this.update3DPreview();
+        }, 16 * 50 + 600);
     }
 }
 
