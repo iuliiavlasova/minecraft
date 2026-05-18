@@ -17,25 +17,105 @@ body {
 
 .container {
     text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
     padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(15px);
+    max-width: 600px;
 }
 
 /* Logo section */
 .logo-section {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .logo {
-    max-width: 300px;
+    max-width: 280px;
     height: auto;
-    border-radius: 10px;
+    border-radius: 12px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
-/* Game board */
+/* Layer Controls */
+.layer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.layer-button {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    font-family: inherit;
+    min-width: 140px;
+}
+
+.layer-button:hover {
+    background: linear-gradient(45deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.4);
+}
+
+.layer-button:active {
+    transform: translateY(0);
+}
+
+.layer-button:disabled {
+    background: linear-gradient(45deg, #ccc, #bbb);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.layer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 15px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    min-width: 80px;
+}
+
+.layer-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.layer-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2196F3;
+    text-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+/* Game board container with 3D effect */
+.game-board-container {
+    position: relative;
+    margin: 0 auto 30px auto;
+    width: 420px;
+    perspective: 1000px;
+}
+
 .game-board {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -43,116 +123,279 @@ body {
     gap: 4px;
     width: 400px;
     height: 400px;
-    margin: 0 auto 30px auto;
-    background-color: #8B4513;
-    border-radius: 15px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border-radius: 18px;
     padding: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.layer-shadow {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #6B3410, #7A3B12);
+    border-radius: 18px;
+    z-index: 1;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.game-board:hover {
+    transform: translateY(-2px);
+}
+
+.game-board:hover + .layer-shadow {
+    transform: translateY(2px);
+    opacity: 0.8;
 }
 
 .grid-square {
-    width: 90px;
-    height: 90px;
+    width: 88px;
+    height: 88px;
     border: 3px solid #654321;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
+    overflow: hidden;
 }
 
 /* Square states */
 .grid-square.empty {
-    background-color: #DEB887;
+    background: linear-gradient(135deg, #F5DEB3, #DEB887);
     background-image: none;
+    border-color: #D2B48C;
 }
 
 .grid-square.grass {
     background-image: url('assets/grass block.png');
     background-color: #90EE90;
+    border-color: #7CCD7C;
 }
 
 .grid-square.stone {
     background-image: url('assets/Stone_JE5_BE3.png');
     background-color: #696969;
+    border-color: #556B2F;
 }
 
 .grid-square.wood {
     background-image: url('assets/wood.jpg');
     background-color: #DEB887;
+    border-color: #CD853F;
 }
 
-/* Hover effects */
+.grid-square.diamond {
+    background-image: url('assets/Diamond.webp');
+    background-color: #B0E0E6;
+    border-color: #00CED1;
+    box-shadow: 0 0 15px rgba(0, 206, 209, 0.5);
+}
+
+/* Enhanced hover effects */
 .grid-square:hover {
-    transform: scale(1.05);
+    transform: scale(1.08) rotate(1deg);
     border-color: #FFD700;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+    z-index: 10;
 }
 
 .grid-square:active {
     transform: scale(0.95);
+    transition: transform 0.1s ease;
 }
 
-/* Controls section */
+/* Main controls */
 .controls {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.action-button {
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    min-width: 160px;
 }
 
 .house-button {
     background: linear-gradient(45deg, #FF6B6B, #FF8E53);
     color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-    font-family: inherit;
 }
 
 .house-button:hover {
     background: linear-gradient(45deg, #FF5252, #FF7043);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
 }
 
-.house-button:active {
+.clear-button {
+    background: linear-gradient(45deg, #9C27B0, #E91E63);
+    color: white;
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+.clear-button:hover {
+    background: linear-gradient(45deg, #8E24AA, #D81B60);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+}
+
+.action-button:active {
     transform: translateY(0);
 }
 
-/* Instructions */
-.instructions {
-    color: #555;
+/* Block preview section */
+.info-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cycle-title {
+    color: #495057;
     font-size: 16px;
-    line-height: 1.4;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
-.instructions p {
-    margin-bottom: 8px;
+.block-preview-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-/* Fun animations */
+.block-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #333;
+    background-size: cover;
+    background-position: center;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.empty-preview {
+    background: linear-gradient(135deg, #F5DEB3, #DEB887);
+}
+
+.grass-preview {
+    background-image: url('assets/grass block.png');
+    background-color: #90EE90;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.stone-preview {
+    background-image: url('assets/Stone_JE5_BE3.png');
+    background-color: #696969;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.wood-preview {
+    background-image: url('assets/wood.jpg');
+    background-color: #DEB887;
+}
+
+.diamond-preview {
+    background-image: url('assets/Diamond.webp');
+    background-color: #B0E0E6;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 206, 209, 0.5);
+}
+
+.arrow {
+    font-size: 18px;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+/* Enhanced animations */
 @keyframes buildAnimation {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+@keyframes layerTransition {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .grid-square.building {
-    animation: buildAnimation 0.4s ease;
+    animation: buildAnimation 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.game-board.layer-changing {
+    animation: layerTransition 0.4s ease;
+}
+
+/* Sparkle effect for diamond blocks */
+@keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.grid-square.diamond {
+    animation: sparkle 2s ease-in-out infinite;
 }
 
 /* Responsive design for smaller screens */
 @media (max-width: 600px) {
     .container {
         padding: 20px;
+        margin: 10px;
     }
 
-    .game-board {
+    .game-board-container {
+        width: 340px;
+    }
+
+    .game-board, .layer-shadow {
         width: 320px;
         height: 320px;
     }
@@ -163,11 +406,37 @@ body {
     }
 
     .logo {
-        max-width: 250px;
+        max-width: 220px;
     }
 
-    .house-button {
-        padding: 12px 24px;
-        font-size: 16px;
+    .action-button {
+        padding: 12px 20px;
+        font-size: 14px;
+        min-width: 140px;
+    }
+
+    .layer-controls {
+        gap: 15px;
+        padding: 12px;
+    }
+
+    .layer-button {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-width: 120px;
+    }
+
+    .layer-number {
+        font-size: 24px;
+    }
+
+    .block-preview {
+        width: 40px;
+        height: 40px;
+        font-size: 8px;
+    }
+
+    .arrow {
+        font-size: 14px;
     }
 }

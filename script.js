@@ -1,25 +1,44 @@
-// Game state management
+// Enhanced Multi-Layer Minecraft Game for Children
 class MinecraftGame {
     constructor() {
-        // Define the 4 states in cycle order
-        this.states = ['empty', 'grass', 'stone', 'wood'];
+        // Define the 5 block states in cycle order (added Diamond!)
+        this.states = ['empty', 'grass', 'stone', 'wood', 'diamond'];
 
-        // Initialize 4x4 grid - all squares start as empty
-        this.grid = [];
-        for (let i = 0; i < 16; i++) {
-            this.grid[i] = 0; // 0 = empty state
-        }
+        // Multi-layer system: Each layer is a 4x4 grid (16 squares)
+        this.layers = [];
+        this.currentLayer = 0; // Starting at layer 0 (display as Layer 1)
+        this.maxLayers = 8; // Allow up to 8 layers for tall buildings
 
+        // Initialize first layer - all squares start as empty
+        this.initializeLayers();
+
+        // Get DOM elements
         this.gameBoard = document.getElementById('gameBoard');
         this.houseButton = document.getElementById('houseButton');
+        this.clearButton = document.getElementById('clearButton');
+        this.layerUpButton = document.getElementById('layerUpButton');
+        this.layerDownButton = document.getElementById('layerDownButton');
+        this.layerNumber = document.getElementById('layerNumber');
 
         this.initializeGame();
     }
 
-    // Create the game board with 16 squares
+    // Initialize the layer system
+    initializeLayers() {
+        for (let layer = 0; layer < this.maxLayers; layer++) {
+            this.layers[layer] = [];
+            for (let i = 0; i < 16; i++) {
+                this.layers[layer][i] = 0; // 0 = empty state
+            }
+        }
+    }
+
+    // Set up the game board and event listeners
     initializeGame() {
         this.createGameBoard();
         this.setupEventListeners();
+        this.updateLayerDisplay();
+        this.updateLayerButtons();
     }
 
     // Generate the 4x4 grid of clickable squares
@@ -29,15 +48,21 @@ class MinecraftGame {
         for (let i = 0; i < 16; i++) {
             const square = document.createElement('div');
             square.classList.add('grid-square');
-            square.dataset.index = i; // Store square index for easy reference
+            square.dataset.index = i;
             this.updateSquareAppearance(square, i);
             this.gameBoard.appendChild(square);
         }
+
+        // Add layer transition animation
+        this.gameBoard.classList.add('layer-changing');
+        setTimeout(() => {
+            this.gameBoard.classList.remove('layer-changing');
+        }, 400);
     }
 
-    // Set up click handlers
+    // Set up all event listeners
     setupEventListeners() {
-        // Handle square clicks
+        // Handle square clicks for building
         this.gameBoard.addEventListener('click', (event) => {
             if (event.target.classList.contains('grid-square')) {
                 const index = parseInt(event.target.dataset.index);
@@ -45,83 +70,266 @@ class MinecraftGame {
             }
         });
 
-        // Handle house button
+        // Handle house building
         this.houseButton.addEventListener('click', () => {
-            this.buildHouse();
+            this.buildMultiLayerHouse();
+        });
+
+        // Handle layer clearing
+        this.clearButton.addEventListener('click', () => {
+            this.clearCurrentLayer();
+        });
+
+        // Handle layer navigation
+        this.layerUpButton.addEventListener('click', () => {
+            this.goToLayer(this.currentLayer + 1);
+        });
+
+        this.layerDownButton.addEventListener('click', () => {
+            this.goToLayer(this.currentLayer - 1);
+        });
+
+        // Keyboard shortcuts for quick layer switching (for parents/advanced users)
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp' && event.ctrlKey) {
+                event.preventDefault();
+                this.goToLayer(this.currentLayer + 1);
+            } else if (event.key === 'ArrowDown' && event.ctrlKey) {
+                event.preventDefault();
+                this.goToLayer(this.currentLayer - 1);
+            }
         });
     }
 
-    // Cycle through states: Empty → Grass → Stone → Wood → Empty
+    // Cycle through block states: Empty → Grass → Stone → Wood → Diamond → Empty
     cycleSquareState(index) {
+        // Get current layer's grid
+        const currentGrid = this.layers[this.currentLayer];
+
         // Move to next state (with wraparound)
-        this.grid[index] = (this.grid[index] + 1) % this.states.length;
+        currentGrid[index] = (currentGrid[index] + 1) % this.states.length;
 
         // Update visual appearance
         const square = document.querySelector(`[data-index="${index}"]`);
         this.updateSquareAppearance(square, index);
 
-        // Add fun building animation
+        // Add enhanced building animation
         square.classList.add('building');
         setTimeout(() => {
             square.classList.remove('building');
-        }, 400);
+        }, 600);
+
+        // Add sparkle effect for diamond blocks
+        if (this.states[currentGrid[index]] === 'diamond') {
+            this.addSparkleEffect(square);
+        }
     }
 
     // Update the visual appearance of a square based on its state
     updateSquareAppearance(square, index) {
+        const currentGrid = this.layers[this.currentLayer];
+
         // Remove all state classes
-        square.classList.remove('empty', 'grass', 'stone', 'wood');
+        square.classList.remove('empty', 'grass', 'stone', 'wood', 'diamond');
 
         // Add the current state class
-        const currentState = this.states[this.grid[index]];
+        const currentState = this.states[currentGrid[index]];
         square.classList.add(currentState);
     }
 
-    // Build a simple house automatically
-    buildHouse() {
-        // House pattern for 4x4 grid:
-        // [    ][    ][    ][    ]  Row 0: Empty (sky)
-        // [Wood][Wood][Wood][Wood] Row 1: Wood roof/top wall
-        // [Wood][    ][    ][Wood] Row 2: Side walls with empty inside
-        // [Stone][Stone][Stone][Stone] Row 3: Stone floor
+    // Navigate to a specific layer
+    goToLayer(targetLayer) {
+        // Clamp to valid range
+        targetLayer = Math.max(0, Math.min(this.maxLayers - 1, targetLayer));
 
-        const housePattern = [
-            0, 0, 0, 0,     // Row 0: Empty
-            3, 3, 3, 3,     // Row 1: Wood (index 3 in states array)
-            3, 0, 0, 3,     // Row 2: Wood sides, empty middle
-            2, 2, 2, 2      // Row 3: Stone (index 2 in states array)
-        ];
+        if (targetLayer !== this.currentLayer) {
+            this.currentLayer = targetLayer;
+            this.updateLayerDisplay();
+            this.updateLayerButtons();
+            this.refreshGameBoard();
+        }
+    }
 
-        // Apply the house pattern with animation
-        housePattern.forEach((state, index) => {
+    // Refresh the game board to show current layer
+    refreshGameBoard() {
+        for (let i = 0; i < 16; i++) {
+            const square = document.querySelector(`[data-index="${i}"]`);
+            this.updateSquareAppearance(square, i);
+        }
+
+        // Add transition animation
+        this.gameBoard.classList.add('layer-changing');
+        setTimeout(() => {
+            this.gameBoard.classList.remove('layer-changing');
+        }, 400);
+    }
+
+    // Update the layer display
+    updateLayerDisplay() {
+        this.layerNumber.textContent = this.currentLayer + 1; // Display as 1-based
+    }
+
+    // Update layer button states
+    updateLayerButtons() {
+        // Disable/enable buttons based on current layer
+        this.layerDownButton.disabled = this.currentLayer <= 0;
+        this.layerUpButton.disabled = this.currentLayer >= this.maxLayers - 1;
+
+        // Visual feedback for current position
+        if (this.currentLayer === 0) {
+            this.layerDownButton.textContent = '🏠 Ground Floor';
+        } else {
+            this.layerDownButton.textContent = '⬇️ Layer Down';
+        }
+
+        if (this.currentLayer === this.maxLayers - 1) {
+            this.layerUpButton.textContent = '☁️ Sky Limit';
+        } else {
+            this.layerUpButton.textContent = '⬆️ Layer Up';
+        }
+    }
+
+    // Clear the current layer
+    clearCurrentLayer() {
+        const currentGrid = this.layers[this.currentLayer];
+
+        // Clear all squares with animation
+        for (let i = 0; i < 16; i++) {
             setTimeout(() => {
-                this.grid[index] = state;
-                const square = document.querySelector(`[data-index="${index}"]`);
-                this.updateSquareAppearance(square, index);
+                currentGrid[i] = 0; // Set to empty
+                const square = document.querySelector(`[data-index="${i}"]`);
+                this.updateSquareAppearance(square, i);
 
-                // Add building animation
+                // Add clearing animation
                 square.classList.add('building');
                 setTimeout(() => {
                     square.classList.remove('building');
-                }, 400);
-            }, index * 100); // Stagger the building animation
+                }, 600);
+            }, i * 50); // Stagger the clearing animation
+        }
+    }
+
+    // Build a multi-layer house automatically
+    buildMultiLayerHouse() {
+        // Layer 1 (index 0): Stone foundation
+        const foundationPattern = [
+            2, 2, 2, 2,     // Row 0: Stone foundation
+            2, 2, 2, 2,     // Row 1: Stone foundation
+            2, 2, 2, 2,     // Row 2: Stone foundation
+            2, 2, 2, 2      // Row 3: Stone foundation
+        ];
+
+        // Layer 2 (index 1): Wood walls with door
+        const wallsPattern = [
+            3, 3, 3, 3,     // Row 0: Wood walls
+            3, 0, 0, 3,     // Row 1: Wood walls with empty inside
+            3, 0, 0, 3,     // Row 2: Wood walls with empty inside (door on left)
+            3, 0, 0, 3      // Row 3: Wood walls with empty inside
+        ];
+
+        // Layer 3 (index 2): Wood roof with diamond decoration
+        const roofPattern = [
+            3, 3, 3, 3,     // Row 0: Wood roof
+            3, 4, 4, 3,     // Row 1: Wood with diamond decorations
+            3, 4, 4, 3,     // Row 2: Wood with diamond decorations
+            3, 3, 3, 3      // Row 3: Wood roof
+        ];
+
+        // Apply patterns to different layers
+        this.applyPatternToLayer(0, foundationPattern, 'Foundation');
+        setTimeout(() => {
+            this.applyPatternToLayer(1, wallsPattern, 'Walls');
+        }, 1000);
+        setTimeout(() => {
+            this.applyPatternToLayer(2, roofPattern, 'Roof');
+        }, 2000);
+
+        // Navigate to the foundation layer to start
+        setTimeout(() => {
+            this.goToLayer(0);
+        }, 3000);
+    }
+
+    // Apply a pattern to a specific layer
+    applyPatternToLayer(layerIndex, pattern, layerName) {
+        console.log(`Building ${layerName} on layer ${layerIndex + 1}...`);
+
+        pattern.forEach((state, index) => {
+            setTimeout(() => {
+                this.layers[layerIndex][index] = state;
+
+                // If we're viewing this layer, update visuals
+                if (this.currentLayer === layerIndex) {
+                    const square = document.querySelector(`[data-index="${index}"]`);
+                    this.updateSquareAppearance(square, index);
+
+                    // Add building animation
+                    square.classList.add('building');
+                    setTimeout(() => {
+                        square.classList.remove('building');
+                    }, 600);
+                }
+            }, index * 80); // Stagger the building animation
         });
+    }
+
+    // Add sparkle effect for special blocks
+    addSparkleEffect(square) {
+        // Add temporary sparkle class for extra visual feedback
+        square.style.boxShadow = '0 0 20px rgba(0, 206, 209, 0.8)';
+        setTimeout(() => {
+            square.style.boxShadow = '';
+        }, 1000);
+    }
+
+    // Helper method to check if current layer has any blocks
+    hasBlocksInCurrentLayer() {
+        const currentGrid = this.layers[this.currentLayer];
+        return currentGrid.some(state => state !== 0);
+    }
+
+    // Get layer summary for debugging/info
+    getLayerSummary() {
+        return this.layers.map((layer, index) => {
+            const blockCount = layer.filter(state => state !== 0).length;
+            return `Layer ${index + 1}: ${blockCount} blocks`;
+        }).join('\n');
     }
 }
 
-// Initialize the game when page loads
+// Initialize the enhanced game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new MinecraftGame();
+    // Create the game instance
+    const game = new MinecraftGame();
+
+    // Add some helpful console messages for parents/developers
+    console.log('🎮 Mini Minecraft Builder Enhanced!');
+    console.log('Keyboard shortcuts for parents:');
+    console.log('• Ctrl + ↑ : Go up one layer');
+    console.log('• Ctrl + ↓ : Go down one layer');
+
+    // Make game accessible globally for debugging
+    window.minecraftGame = game;
 });
 
-// Add some fun sound effects (optional - commented out since we don't have audio files)
-/*
-function playSound(soundName) {
-    const audio = new Audio(`assets/${soundName}.mp3`);
-    audio.volume = 0.3; // Keep it quiet for kids
-    audio.play().catch(e => {
-        // Ignore audio errors if files don't exist
-        console.log('Audio not available:', soundName);
-    });
+// Fun sound effects placeholder (can be enabled when audio files are added)
+function playBuildSound(blockType) {
+    // Could add different sounds for different block types
+    console.log(`🔊 Building ${blockType} block!`);
 }
-*/
+
+// Achievement system for encouragement (expandable)
+class AchievementSystem {
+    constructor() {
+        this.achievements = [
+            { id: 'first_diamond', name: 'Diamond Discoverer', description: 'Place your first diamond block!' },
+            { id: 'layer_builder', name: 'Sky Builder', description: 'Build on 3 different layers!' },
+            { id: 'house_architect', name: 'Architect', description: 'Use the house builder!' }
+        ];
+    }
+
+    // This could be expanded to show fun achievements for kids
+    unlock(achievementId) {
+        console.log(`🏆 Achievement unlocked: ${achievementId}`);
+    }
+}
