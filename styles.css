@@ -1,0 +1,173 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Comic Sans MS', 'Arial', sans-serif;
+    background: linear-gradient(135deg, #87CEEB 0%, #98FB98 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Logo section */
+.logo-section {
+    margin-bottom: 30px;
+}
+
+.logo {
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Game board */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 4px;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto 30px auto;
+    background-color: #8B4513;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.grid-square {
+    width: 90px;
+    height: 90px;
+    border: 3px solid #654321;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Square states */
+.grid-square.empty {
+    background-color: #DEB887;
+    background-image: none;
+}
+
+.grid-square.grass {
+    background-image: url('assets/grass block.png');
+    background-color: #90EE90;
+}
+
+.grid-square.stone {
+    background-image: url('assets/Stone_JE5_BE3.png');
+    background-color: #696969;
+}
+
+.grid-square.wood {
+    background-image: url('assets/wood.jpg');
+    background-color: #DEB887;
+}
+
+/* Hover effects */
+.grid-square:hover {
+    transform: scale(1.05);
+    border-color: #FFD700;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.grid-square:active {
+    transform: scale(0.95);
+}
+
+/* Controls section */
+.controls {
+    margin-bottom: 20px;
+}
+
+.house-button {
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    font-family: inherit;
+}
+
+.house-button:hover {
+    background: linear-gradient(45deg, #FF5252, #FF7043);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.house-button:active {
+    transform: translateY(0);
+}
+
+/* Instructions */
+.instructions {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.instructions p {
+    margin-bottom: 8px;
+}
+
+/* Fun animations */
+@keyframes buildAnimation {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.grid-square.building {
+    animation: buildAnimation 0.4s ease;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    .game-board {
+        width: 320px;
+        height: 320px;
+    }
+
+    .grid-square {
+        width: 70px;
+        height: 70px;
+    }
+
+    .logo {
+        max-width: 250px;
+    }
+
+    .house-button {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+}
