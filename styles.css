@@ -29,10 +29,107 @@ body {
 /* Main game area with side-by-side layout */
 .game-area {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     align-items: flex-start;
     justify-content: center;
     margin: 20px 0;
+    position: relative;
+}
+
+/* Steve Companion */
+.steve-companion {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.steve-character {
+    width: 80px;
+    height: auto;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    cursor: pointer;
+}
+
+.steve-character:hover {
+    transform: scale(1.1) rotate(2deg);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* Steve Speech Bubble */
+.steve-speech-bubble {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 3px solid #4CAF50;
+    border-radius: 15px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 10;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: bold;
+    color: #2E7D32;
+}
+
+.steve-speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+}
+
+.steve-speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #4CAF50;
+    z-index: -1;
+}
+
+.steve-speech-bubble.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+/* Steve idle animation */
+@keyframes steveIdle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
+}
+
+.steve-character.idle {
+    animation: steveIdle 3s ease-in-out infinite;
+}
+
+/* Steve excited animation */
+@keyframes steveExcited {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+}
+
+.steve-character.excited {
+    animation: steveExcited 0.6s ease-in-out;
 }
 
 .building-panel {
@@ -546,6 +643,12 @@ body {
         align-items: center;
     }
 
+    .steve-companion {
+        order: -1;
+        margin-bottom: 20px;
+        margin-right: 0;
+    }
+
     .building-panel, .preview-panel {
         min-width: unset;
         width: 100%;
@@ -639,5 +742,15 @@ body {
     .preview-button {
         padding: 6px 12px;
         font-size: 11px;
+    }
+
+    .steve-character {
+        width: 60px;
+    }
+
+    .steve-speech-bubble {
+        font-size: 10px;
+        padding: 6px 10px;
+        top: -45px;
     }
 }

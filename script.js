@@ -23,6 +23,10 @@ class MinecraftGame {
         // 3D Preview elements
         this.preview3D = document.getElementById('preview3D');
 
+        // Steve Companion elements
+        this.steveCharacter = document.getElementById('steveCharacter');
+        this.steveSpeech = document.getElementById('steveSpeech');
+
         this.initializeGame();
     }
 
@@ -41,6 +45,7 @@ class MinecraftGame {
         this.createGameBoard();
         this.create3DPreview();
         this.setupEventListeners();
+        this.setupSteve();
         this.updateLayerDisplay();
         this.updateLayerButtons();
         this.update3DPreview();
@@ -128,6 +133,11 @@ class MinecraftGame {
         // Add sparkle effect for diamond blocks
         if (this.states[currentGrid[index]] === 'diamond') {
             this.addSparkleEffect(square);
+            // Steve reacts to diamond placement
+            setTimeout(() => this.showSteveMessage('diamond'), 200);
+        } else if (this.states[currentGrid[index]] !== 'empty') {
+            // Steve reacts to regular building
+            setTimeout(() => this.showSteveMessage('building'), 100);
         }
 
         // Update 3D preview
@@ -156,6 +166,9 @@ class MinecraftGame {
             this.updateLayerDisplay();
             this.updateLayerButtons();
             this.refreshGameBoard();
+
+            // Steve reacts to layer change
+            setTimeout(() => this.showSteveMessage('layer'), 300);
         }
     }
 
@@ -241,6 +254,11 @@ class MinecraftGame {
         setTimeout(() => {
             this.goToLayer(0);
         }, 3000);
+
+        // Steve celebrates the house completion
+        setTimeout(() => {
+            this.showSteveMessage('house');
+        }, 3500);
     }
 
     // Apply a pattern to a specific layer
@@ -292,6 +310,89 @@ class MinecraftGame {
             const blockCount = layer.filter(state => state !== 0).length;
             return `Layer ${index + 1}: ${blockCount} blocks`;
         }).join('\n');
+    }
+
+    // === STEVE COMPANION SYSTEM ===
+
+    // Set up Steve companion interactions
+    setupSteve() {
+        // Steve messages for different situations
+        this.steveMessages = {
+            welcome: ["Ready to build! 🔨", "Let's create something amazing! ✨", "I'm here to help! 😊"],
+            building: ["Great choice! 👍", "Nice block placement! 🎯", "You're a natural builder! 🏗️", "Keep going! 💪"],
+            diamond: ["Wow, diamonds! ✨", "Shiny! I love diamonds! 💎", "That's precious! 💎✨"],
+            house: ["Amazing house! 🏠", "What a beautiful home! 🏡", "You're an architect! 👷", "Fantastic building! 🌟"],
+            layer: ["New layer, new possibilities! 🚀", "Building up! ⬆️", "Next floor! 🏗️", "Going higher! 🌟"],
+            clear: ["Clean slate! 🧽", "Fresh start! ✨", "Ready for new ideas! 💡"]
+        };
+
+        // Start with idle animation
+        this.steveCharacter.classList.add('idle');
+
+        // Steve click interaction
+        this.steveCharacter.addEventListener('click', () => {
+            this.steveInteraction();
+        });
+
+        // Show welcome message
+        setTimeout(() => {
+            this.showSteveMessage('welcome');
+        }, 1000);
+    }
+
+    // Steve interaction when clicked
+    steveInteraction() {
+        // Add excited animation
+        this.steveCharacter.classList.remove('idle');
+        this.steveCharacter.classList.add('excited');
+
+        // Show random encouraging message
+        const messages = [
+            "Hi there! 👋",
+            "Keep building! 🔨",
+            "You're doing great! ⭐",
+            "I believe in you! 💪",
+            "What will you build next? 🤔",
+            "Building is fun! 🎮"
+        ];
+
+        this.steveSpeech.innerHTML = `<p>${messages[Math.floor(Math.random() * messages.length)]}</p>`;
+        this.steveSpeech.classList.add('show');
+
+        // Hide message after 3 seconds
+        setTimeout(() => {
+            this.steveSpeech.classList.remove('show');
+        }, 3000);
+
+        // Return to idle animation
+        setTimeout(() => {
+            this.steveCharacter.classList.remove('excited');
+            this.steveCharacter.classList.add('idle');
+        }, 600);
+    }
+
+    // Show Steve message for different events
+    showSteveMessage(eventType) {
+        const messages = this.steveMessages[eventType] || this.steveMessages.welcome;
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+        this.steveSpeech.innerHTML = `<p>${randomMessage}</p>`;
+        this.steveSpeech.classList.add('show');
+
+        // Animate Steve
+        this.steveCharacter.classList.remove('idle');
+        this.steveCharacter.classList.add('excited');
+
+        // Hide message after 2.5 seconds
+        setTimeout(() => {
+            this.steveSpeech.classList.remove('show');
+        }, 2500);
+
+        // Return to idle
+        setTimeout(() => {
+            this.steveCharacter.classList.remove('excited');
+            this.steveCharacter.classList.add('idle');
+        }, 600);
     }
 
     // === 3D PREVIEW SYSTEM ===
@@ -378,6 +479,11 @@ class MinecraftGame {
         setTimeout(() => {
             this.update3DPreview();
         }, 16 * 50 + 600);
+
+        // Steve reacts to clearing
+        setTimeout(() => {
+            this.showSteveMessage('clear');
+        }, 16 * 50 + 800);
     }
 }
 
